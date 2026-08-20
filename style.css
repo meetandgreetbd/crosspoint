@@ -1,0 +1,17 @@
+/*
+Theme Name: CrossPoint
+Theme URI: https://crosspointformations.com/
+Author: CrossPoint Formations Inc.
+Author URI: https://crosspointformations.com/
+Description: Custom WordPress theme for CrossPoint Formations. Pixel port of the static crosspointformations.com site: shared header/footer, mega menu, Packages CPT as the single source of pricing, lead REST pipeline and the /start/ wizard. No page builders, no jQuery.
+Version: 1.0.0
+Requires at least: 6.4
+Tested up to: 6.8
+Requires PHP: 8.1
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: crosspoint
+Tags: business, custom-theme
+
+This file carries the theme header only. All real CSS lives in /assets/css/.
+*/

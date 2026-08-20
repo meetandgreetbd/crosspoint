@@ -1,0 +1,59 @@
+# CrossPoint theme — ignored files
+#
+# composer.json and composer.lock ARE committed: they pin the PHPCS/WPCS
+# versions the build spec (section 4) tells everyone to lint with. Only the
+# installed packages are ignored.
+
+# ---------- Composer ----------
+/vendor/
+composer.phar
+.phpcs.cache
+phpcs.xml.bak
+.php-cs-fixer.cache
+
+# ---------- Node / npm ----------
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm/
+.eslintcache
+
+# ---------- Build output ----------
+/dist/
+/build/
+*.map
+
+# ---------- Local environment ----------
+.env
+.env.*
+!.env.example
+*.local
+
+# ---------- Editors ----------
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# ---------- OS ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ---------- Logs and scratch ----------
+*.log
+debug.log
+/tmp/
+*.bak
+*.orig
+*.rej
