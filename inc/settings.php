@@ -184,10 +184,71 @@ function cpf_settings_menu() {
 		'cpf-settings',
 		'cpf_render_settings_page',
 		'dashicons-admin-site-alt3',
-		59
+		// A float keeps this clear of the core positions: 59 is the separator
+		// above Appearance and 60 is Appearance itself, and colliding with
+		// either pushes the menu somewhere unpredictable.
+		58.9
+	);
+
+	// Without this, WordPress labels the first child with the parent's menu
+	// title, giving a "CrossPoint > CrossPoint" entry.
+	add_submenu_page(
+		'cpf-settings',
+		__( 'CrossPoint Settings', 'crosspoint' ),
+		__( 'Settings', 'crosspoint' ),
+		'manage_options',
+		'cpf-settings',
+		'cpf_render_settings_page'
 	);
 }
-add_action( 'admin_menu', 'cpf_settings_menu' );
+// Priority 8: the parent must exist before core attaches the post type
+// submenus, which it does on admin_menu at priority 9.
+add_action( 'admin_menu', 'cpf_settings_menu', 8 );
+
+/**
+ * Flag a fresh activation so the next admin page load can greet the user.
+ *
+ * WordPress does not send anyone anywhere after a theme is activated, so a new
+ * install gives no hint that the packages, pages and menus still need seeding.
+ * The flag is a 60 second transient: if the user navigates elsewhere first it
+ * simply expires and never fires.
+ *
+ * @return void
+ */
+function cpf_flag_activation_redirect() {
+	if ( is_network_admin() ) {
+		return;
+	}
+
+	set_transient( 'cpf_activation_redirect', 1, MINUTE_IN_SECONDS );
+}
+add_action( 'after_switch_theme', 'cpf_flag_activation_redirect' );
+
+/**
+ * Send the user to CrossPoint Settings once, right after activation.
+ *
+ * @return void
+ */
+function cpf_maybe_activation_redirect() {
+	if ( ! get_transient( 'cpf_activation_redirect' ) ) {
+		return;
+	}
+
+	delete_transient( 'cpf_activation_redirect' );
+
+	if ( wp_doing_ajax() || is_network_admin() || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	// Never hijack a bulk theme activation.
+	if ( isset( $_GET['activate-multi'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Presence check only, no data is read.
+		return;
+	}
+
+	wp_safe_redirect( admin_url( 'admin.php?page=cpf-settings' ) );
+	exit;
+}
+add_action( 'admin_init', 'cpf_maybe_activation_redirect' );
 
 /**
  * Sanitize a newline or comma separated list of email addresses.
@@ -309,6 +370,132 @@ function cpf_render_settings_field( $key, $field ) {
 }
 
 /**
+ * Setup status: what is ready and what still needs doing.
+ *
+ * This is the first thing shown after activation, so a new install says plainly
+ * which of the one-time steps are outstanding instead of leaving the user to
+ * guess why the site looks empty.
+ *
+ * @return void
+ */
+function cpf_render_setup_status() {
+	$packages = wp_count_posts( 'cpf_package' );
+	$packages = isset( $packages->publish ) ? (int) $packages->publish : 0;
+
+	$faqs = wp_count_posts( 'cpf_faq' );
+	$faqs = isset( $faqs->publish ) ? (int) $faqs->publish : 0;
+
+	$front     = (int) get_option( 'page_on_front' );
+	$posts_pg  = (int) get_option( 'page_for_posts' );
+	$locations = get_theme_mod( 'nav_menu_locations', array() );
+	$menus     = count( array_filter( (array) $locations ) );
+	$ff_form   = (int) cpf_get_setting( 'ff_form_id' );
+	$ff_active = function_exists( 'wpFluent' );
+
+	$rows = array(
+		array(
+			'label' => __( 'Packages', 'crosspoint' ),
+			'ok'    => $packages > 0,
+			/* translators: %d: number of published packages. */
+			'text'  => sprintf( _n( '%d published', '%d published', $packages, 'crosspoint' ), $packages ),
+			'help'  => __( 'Every price on the site comes from these.', 'crosspoint' ),
+			'link'  => admin_url( 'admin.php?page=cpf-seed-packages' ),
+			'cta'   => __( 'Seed live packages', 'crosspoint' ),
+		),
+		array(
+			'label' => __( 'FAQs', 'crosspoint' ),
+			'ok'    => $faqs > 0,
+			/* translators: %d: number of published FAQs. */
+			'text'  => sprintf( _n( '%d published', '%d published', $faqs, 'crosspoint' ), $faqs ),
+			'help'  => __( 'Shown on the homepage and in the FAQ schema.', 'crosspoint' ),
+			'link'  => admin_url( 'edit.php?post_type=cpf_faq' ),
+			'cta'   => __( 'Manage FAQs', 'crosspoint' ),
+		),
+		array(
+			'label' => __( 'Pages and templates', 'crosspoint' ),
+			'ok'    => $front > 0 && $posts_pg > 0,
+			'text'  => ( $front > 0 && $posts_pg > 0 )
+				? __( 'Homepage and guides page set', 'crosspoint' )
+				: __( 'Not set up yet', 'crosspoint' ),
+			'help'  => __( 'Creates every live URL at the same slug.', 'crosspoint' ),
+			'link'  => admin_url( 'admin.php?page=cpf-scaffold' ),
+			'cta'   => __( 'Set up pages & menus', 'crosspoint' ),
+		),
+		array(
+			'label' => __( 'Menus', 'crosspoint' ),
+			'ok'    => $menus >= 3,
+			/* translators: %d: number of assigned menu locations. */
+			'text'  => sprintf( __( '%d of 3 locations assigned', 'crosspoint' ), $menus ),
+			'help'  => __( 'Header mega menu, footer navigate, footer legal.', 'crosspoint' ),
+			'link'  => admin_url( 'nav-menus.php?action=locations' ),
+			'cta'   => __( 'Menu locations', 'crosspoint' ),
+		),
+		array(
+			'label' => __( 'Lead storage', 'crosspoint' ),
+			'ok'    => $ff_active && $ff_form > 0,
+			'text'  => ( $ff_active && $ff_form > 0 )
+				? __( 'Fluent Forms', 'crosspoint' )
+				: __( 'Theme fallback (no lead is lost)', 'crosspoint' ),
+			'help'  => $ff_active
+				? __( 'Set the form ID on the Leads & Email tab.', 'crosspoint' )
+				: __( 'Install Fluent Forms to store leads in its Entries screen.', 'crosspoint' ),
+			'link'  => admin_url( 'edit.php?post_type=cpf_lead' ),
+			'cta'   => __( 'View stored leads', 'crosspoint' ),
+		),
+	);
+
+	$outstanding = count(
+		array_filter(
+			$rows,
+			function ( $r ) {
+				return ! $r['ok'];
+			}
+		)
+	);
+	?>
+	<div class="card" style="max-width:100%;padding:4px 20px 16px;margin-top:16px">
+		<h2 style="margin-bottom:4px"><?php esc_html_e( 'Setup status', 'crosspoint' ); ?></h2>
+
+		<p class="description" style="margin-bottom:14px">
+			<?php
+			if ( $outstanding ) {
+				printf(
+					/* translators: %d: number of outstanding setup steps. */
+					esc_html( _n( '%d step still needs attention.', '%d steps still need attention.', $outstanding, 'crosspoint' ) ),
+					(int) $outstanding
+				);
+			} else {
+				esc_html_e( 'Everything is set up.', 'crosspoint' );
+			}
+			?>
+		</p>
+
+		<table class="widefat striped">
+			<tbody>
+			<?php foreach ( $rows as $row ) : ?>
+				<tr>
+					<td style="width:26px">
+						<span style="color:<?php echo $row['ok'] ? '#157A4A' : '#B5730E'; ?>;font-weight:700">
+							<?php echo $row['ok'] ? '&#10003;' : '&#33;'; ?>
+						</span>
+					</td>
+					<th scope="row" style="width:190px"><?php echo esc_html( $row['label'] ); ?></th>
+					<td>
+						<strong><?php echo esc_html( $row['text'] ); ?></strong><br>
+						<span class="description"><?php echo esc_html( $row['help'] ); ?></span>
+					</td>
+					<td style="width:190px;text-align:right">
+						<a class="button" href="<?php echo esc_url( $row['link'] ); ?>"><?php echo esc_html( $row['cta'] ); ?></a>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+	<?php
+}
+
+/**
  * Render the settings screen.
  *
  * @return void
@@ -328,6 +515,8 @@ function cpf_render_settings_page() {
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'CrossPoint Settings', 'crosspoint' ); ?></h1>
+
+		<?php cpf_render_setup_status(); ?>
 
 		<h2 class="nav-tab-wrapper">
 			<?php foreach ( $groups as $slug => $group ) : ?>

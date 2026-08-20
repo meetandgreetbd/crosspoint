@@ -20,21 +20,20 @@ function cpf_register_package_cpt() {
 	register_post_type(
 		'cpf_package',
 		array(
-			'label'         => __( 'Packages', 'crosspoint' ),
-			'labels'        => array(
+			'label'        => __( 'Packages', 'crosspoint' ),
+			'labels'       => array(
 				'name'          => __( 'Packages', 'crosspoint' ),
 				'singular_name' => __( 'Package', 'crosspoint' ),
 				'add_new_item'  => __( 'Add package', 'crosspoint' ),
 				'edit_item'     => __( 'Edit package', 'crosspoint' ),
 				'search_items'  => __( 'Search packages', 'crosspoint' ),
 			),
-			'public'        => false,
-			'show_ui'       => true,
-			'show_in_menu'  => true,
-			'show_in_rest'  => false,
-			'supports'      => array( 'title', 'page-attributes' ),
-			'menu_icon'     => 'dashicons-portfolio',
-			'menu_position' => 58,
+			'public'       => false,
+			'show_ui'      => true,
+			'show_in_menu' => 'cpf-settings',
+			'show_in_rest' => false,
+			'supports'     => array( 'title', 'page-attributes' ),
+			'menu_icon'    => 'dashicons-portfolio',
 		)
 	);
 

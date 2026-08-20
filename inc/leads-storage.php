@@ -30,7 +30,7 @@ function cpf_register_lead_cpt() {
 			),
 			'public'          => false,
 			'show_ui'         => true,
-			'show_in_menu'    => 'edit.php?post_type=cpf_package',
+			'show_in_menu'    => 'cpf-settings',
 			'show_in_rest'    => false,
 			'capability_type' => 'post',
 			'capabilities'    => array( 'create_posts' => 'do_not_allow' ),

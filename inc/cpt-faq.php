@@ -19,19 +19,19 @@ function cpf_register_faq_cpt() {
 	register_post_type(
 		'cpf_faq',
 		array(
-			'label'         => __( 'FAQs', 'crosspoint' ),
-			'labels'        => array(
+			'label'        => __( 'FAQs', 'crosspoint' ),
+			'labels'       => array(
 				'name'          => __( 'FAQs', 'crosspoint' ),
 				'singular_name' => __( 'FAQ', 'crosspoint' ),
 				'add_new_item'  => __( 'Add FAQ', 'crosspoint' ),
 				'edit_item'     => __( 'Edit FAQ', 'crosspoint' ),
 			),
-			'public'        => false,
-			'show_ui'       => true,
-			'show_in_rest'  => false,
-			'supports'      => array( 'title', 'editor', 'page-attributes' ),
-			'menu_icon'     => 'dashicons-editor-help',
-			'menu_position' => 60,
+			'public'       => false,
+			'show_ui'      => true,
+			'show_in_menu' => 'cpf-settings',
+			'show_in_rest' => false,
+			'supports'     => array( 'title', 'editor', 'page-attributes' ),
+			'menu_icon'    => 'dashicons-editor-help',
 		)
 	);
 }

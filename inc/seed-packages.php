@@ -487,7 +487,7 @@ add_action( 'after_switch_theme', 'cpf_seed_on_activation' );
  */
 function cpf_seed_menu() {
 	add_submenu_page(
-		'edit.php?post_type=cpf_package',
+		'cpf-settings',
 		__( 'Seed live packages', 'crosspoint' ),
 		__( 'Seed live packages', 'crosspoint' ),
 		'manage_options',

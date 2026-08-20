@@ -15,13 +15,13 @@ get_header();
 ?>
 
 <main id="cpf-main-content">
-<section class="hero">
-<div class="wrap">
-<span class="kicker">Contact us</span>
+<section class="ctc-hero">
+<div class="ctc-wrap">
+<span class="ctc-kicker">Contact us</span>
 <h1>Talk to CrossPoint</h1>
 <p>Real people and honest answers about your Canada or U.S. company setup. WhatsApp is the fastest way to reach us — we usually reply within hours.</p>
 <div class="opts">
-<a class="opt wa" href="<?php echo esc_url( cpf_whatsapp_url( 'Hi CrossPoint, I\'d like to open a company as a non-resident.' ) ); ?>" target="_blank" rel="noopener">
+<a class="opt ctc-wa" href="<?php echo esc_url( cpf_whatsapp_url( 'Hi CrossPoint, I\'d like to open a company as a non-resident.' ) ); ?>" target="_blank" rel="noopener">
 <span class="ic">✆</span>
 <h3>WhatsApp advisor</h3>
 <p>Message us at +1 (437) 434-6994. Fastest replies — ask anything about your setup, pricing, or documents.</p>
@@ -33,7 +33,7 @@ get_header();
 <p>Book a short call to discuss your country, business type, and the best setup path before you pay anything.</p>
 <span class="go">Book a time →</span>
 </a>
-<a class="opt mail" href="<?php echo esc_attr( cpf_mailto_url() ); ?>">
+<a class="opt ctc-mail" href="<?php echo esc_attr( cpf_mailto_url() ); ?>">
 <span class="ic">✉</span>
 <h3>Email support</h3>
 <p>hello@crosspointformations.com — best for documents and detailed questions. We reply within one business day.</p>
@@ -45,10 +45,10 @@ get_header();
 </section>
 
 <section class="formsec">
-<div class="wrap">
+<div class="ctc-wrap">
 <div class="fcard">
 <h2>Send your setup request</h2>
-<p class="sub">Tell us where you're based and what you're building — an advisor will reply by email or WhatsApp.</p>
+<p class="ctc-sub">Tell us where you're based and what you're building — an advisor will reply by email or WhatsApp.</p>
 <form id="cform" novalidate>
 <div class="grid2">
 <div><label for="cf-name">Full name *</label><input id="cf-name" name="name" required autocomplete="name"/></div>
@@ -71,7 +71,7 @@ get_header();
 <textarea id="cf-msg" name="message" placeholder="Tell us about your business…"></textarea>
 <input name="_gotcha" style="display:none" tabindex="-1" autocomplete="off"/>
 <p class="micro">We use this only to contact you about your setup request.</p>
-<button class="btn" id="cf-btn" type="submit">Send My Request</button>
+<button class="ctc-btn" id="cf-btn" type="submit">Send My Request</button>
 <p class="fmsg" id="cf-msgout"></p>
 </form>
 </div>
