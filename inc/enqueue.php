@@ -12,13 +12,31 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Cache-busting version for a theme asset.
+ *
+ * The theme version alone is not enough: editing a stylesheet without bumping
+ * it leaves browsers on the cached copy, which hides the change. The file's
+ * modification time changes with every edit, so the URL always does too.
+ *
+ * @param string $rel Theme-relative path, e.g. assets/css/main.css.
+ * @return string Version string.
+ */
+function cpf_asset_version( $rel ) {
+	$path = get_theme_file_path( $rel );
+
+	if ( file_exists( $path ) ) {
+		return CPF_VERSION . '.' . filemtime( $path );
+	}
+
+	return CPF_VERSION;
+}
+
+/**
  * Enqueue front-end styles and scripts.
  *
  * @return void
  */
 function cpf_enqueue() {
-	$ver = CPF_VERSION;
-
 	wp_enqueue_style(
 		'cpf-fonts',
 		'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Inter:wght@400;500;600;700&display=swap',
@@ -33,24 +51,35 @@ function cpf_enqueue() {
 		'6.5.1'
 	);
 
-	wp_enqueue_style( 'cpf-main', get_theme_file_uri( 'assets/css/main.css' ), array( 'cpf-fonts', 'cpf-icons' ), $ver );
+	wp_enqueue_style( 'cpf-main', get_theme_file_uri( 'assets/css/main.css' ), array( 'cpf-fonts', 'cpf-icons' ), cpf_asset_version( 'assets/css/main.css' ) );
 
-	wp_enqueue_script( 'cpf-main', get_theme_file_uri( 'assets/js/main.js' ), array(), $ver, true );
+	wp_enqueue_script( 'cpf-main', get_theme_file_uri( 'assets/js/main.js' ), array(), cpf_asset_version( 'assets/js/main.js' ), true );
 	wp_localize_script( 'cpf-main', 'cpfSite', cpf_site_config() );
 
 	if ( is_front_page() ) {
-		wp_enqueue_script( 'cpf-quiz', get_theme_file_uri( 'assets/js/quiz.js' ), array( 'cpf-main' ), $ver, true );
+		wp_enqueue_script( 'cpf-quiz', get_theme_file_uri( 'assets/js/quiz.js' ), array( 'cpf-main' ), cpf_asset_version( 'assets/js/quiz.js' ), true );
 		cpf_localize_lead_config( 'cpf-quiz', 'home-quiz' );
 	}
 
+	// FilingGuard is the one page with its own typography. Its three families are
+	// loaded only there, so no other page pays for them.
+	if ( is_page_template( 'page-templates/template-filingguard.php' ) ) {
+		wp_enqueue_style(
+			'cpf-fonts-filingguard',
+			'https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap',
+			array(),
+			null // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- The Google Fonts URL is already versioned.
+		);
+	}
+
 	if ( is_page_template( 'page-templates/template-start.php' ) ) {
-		wp_enqueue_style( 'cpf-start', get_theme_file_uri( 'assets/css/start.css' ), array( 'cpf-main' ), $ver );
-		wp_enqueue_script( 'cpf-start', get_theme_file_uri( 'assets/js/start.js' ), array( 'cpf-main' ), $ver, true );
+		wp_enqueue_style( 'cpf-start', get_theme_file_uri( 'assets/css/start.css' ), array( 'cpf-main' ), cpf_asset_version( 'assets/css/start.css' ) );
+		wp_enqueue_script( 'cpf-start', get_theme_file_uri( 'assets/js/start.js' ), array( 'cpf-main' ), cpf_asset_version( 'assets/js/start.js' ), true );
 		cpf_localize_lead_config( 'cpf-start', 'start-wizard' );
 	}
 
 	if ( cpf_chat_enabled() ) {
-		wp_enqueue_script( 'cpf-chat', get_theme_file_uri( 'assets/js/chat.js' ), array( 'cpf-main' ), $ver, true );
+		wp_enqueue_script( 'cpf-chat', get_theme_file_uri( 'assets/js/chat.js' ), array( 'cpf-main' ), cpf_asset_version( 'assets/js/chat.js' ), true );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'cpf_enqueue' );

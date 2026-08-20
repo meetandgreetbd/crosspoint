@@ -95,6 +95,7 @@ $cpf_contact_ur = cpf_page_url( 'contact-us' );
 						'container'      => false,
 						'items_wrap'     => '%3$s',
 						'depth'          => 1,
+						'walker'         => new CPF_Link_List_Walker(),
 						'fallback_cb'    => false,
 					)
 				);

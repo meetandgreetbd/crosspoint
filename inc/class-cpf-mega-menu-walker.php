@@ -142,14 +142,22 @@ class CPF_Mega_Menu_Walker extends Walker_Nav_Menu {
 			$parent_classes = (array) $this->parent_item->classes;
 		}
 
-		$link_class = in_array( 'mega-feature', $parent_classes, true ) ? ' class="mega-fbtn"' : '';
+		$is_feature = in_array( 'mega-feature', $parent_classes, true );
+		$link_class = $is_feature ? ' class="mega-fbtn"' : '';
+
+		// The promo column's call to action carries a trailing arrow, as on the
+		// live site. It stays an anchor rather than the live <button>, so the
+		// item actually navigates - which is the point of rebuilding the mega
+		// menu as a real WordPress menu.
+		$icon = $is_feature ? ' <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>' : '';
 
 		$output .= sprintf(
-			'<a href="%1$s"%2$s%3$s>%4$s%5$s</a>',
+			'<a href="%1$s"%2$s%3$s>%4$s%5$s%6$s</a>',
 			esc_url( $url ),
 			$link_class,
 			$item->target ? ' target="' . esc_attr( $item->target ) . '" rel="noopener"' : '',
 			esc_html( $title ),
+			$icon,
 			$this->badge( $item )
 		);
 	}

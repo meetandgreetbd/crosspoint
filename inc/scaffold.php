@@ -321,16 +321,16 @@ function cpf_scaffold_menus() {
 					'page'  => 'pricing',
 				),
 				array(
+					'title' => 'Resources',
+					'url'   => '/#resources',
+				),
+				array(
 					'title' => 'Guides',
 					'page'  => 'guides',
 				),
 				array(
 					'title' => 'Pricing',
 					'page'  => 'pricing',
-				),
-				array(
-					'title' => 'FilingGuard',
-					'page'  => 'filingguard',
 				),
 				array(
 					'title' => 'Contact Us',
